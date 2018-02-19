@@ -23,18 +23,32 @@ class ChartRenderer {
         this.interpolator = options.interpolatorType || 'linear';
     }
 
+    /**
+     * Sets the interpolator property and
+     * detaches the old instance of the chart
+     * than re-renders it.
+     * @param {String} interpolator
+     */
     setInterpolator(interpolator) {
         this.interpolator = interpolator;
         this.destroy();
         this.drawLine();
     }
 
+    /**
+     * Updates the sample dataset for the
+     * chart and re-renders it.
+     */
     update() {
         this.destroy();
         this.sampleDatas = this.populateSampleData();
         this.drawLine();
     }
 
+    /**
+     * Selects the SVG container than
+     * detaches it from the DOM.
+     */
     destroy() {
         d3.select('.chart-graph').remove();
     }
