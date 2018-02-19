@@ -5,7 +5,7 @@ class ChartRenderer {
      * Generate sample data after creating
      * the new instance of the chart.
      */
-    constructor() {
+    constructor(options) {
         // Override the Date API addDays proc.
         Date.prototype.addDays = function(days) {
             let date = new Date(this.valueOf());
@@ -13,8 +13,30 @@ class ChartRenderer {
             return date;
         };
 
+        // Set chart options
+        this.options = options;
+
         // Generate sample data for the default state
         this.sampleDatas = this.populateSampleData();
+
+        // Default definition of the interpolator
+        this.interpolator = options.interpolatorType || 'linear';
+    }
+
+    setInterpolator(interpolator) {
+        this.interpolator = interpolator;
+        this.destroy();
+        this.drawLine();
+    }
+
+    update() {
+        this.destroy();
+        this.sampleDatas = this.populateSampleData();
+        this.drawLine();
+    }
+
+    destroy() {
+        d3.select('.chart-graph').remove();
     }
 
     /**
@@ -54,15 +76,71 @@ class ChartRenderer {
         return dateArray;
     }
 
+    drawCirclePolygons(points, xScale, yScale) {
+        let circles = [];
+
+        if (points.length === 1) {
+            circles.push({
+                point: points[0]
+            });
+
+            return circles;
+        }
+
+        points.forEach(function (point, index, list) {
+            // if (point.y[index - 1] !== null) {
+            //     console.log('exclude');
+            //     return;
+            // }
+
+            let prevPoint = list[index - 1],
+                nextPoint = list[index + 1];
+
+            if (prevPoint) {
+                circles.push({
+                    point: prevPoint
+                });
+            }
+
+            if (nextPoint) {
+                circles.push({
+                    point: nextPoint
+                });
+            }
+        });
+
+        var circleData = d3.select('.chart-graph').selectAll('circle')
+            .data(circles);
+
+        circleData.enter()
+            .append('svg:circle')
+            .attr({
+                'cx': function (d) {
+                    return xScale(d.point.x);
+                }.bind(this),
+                'cy': function (d) {
+                    return yScale(d.point.y);
+                }.bind(this),
+                'r': 4.5,
+                'stroke-width': 3,
+                'stroke': 'black',
+                'fill': 'black',
+            });
+
+        circleData.exit()
+            .remove();
+
+    }
+
     /**
      * Draws the actual SVG line and places the
      * value paths.
-     * @param {Object} chartOptions
      */
-    drawLine(chartOptions) {
+    drawLine() {
+
         let margin = { top: 30, right: 20, bottom: 30, left: 100 },
-            width = 1024 - margin.left - margin.right,
-            height = 550 - margin.top - margin.bottom;
+        width = 1024 - margin.left - margin.right,
+        height = 550 - margin.top - margin.bottom;
         let parseDate = d3.time.format('%d-%b-%y').parse;
 
         // Calculate the ranges
@@ -72,9 +150,9 @@ class ChartRenderer {
         // Calculate axes
         let xAxis = d3.svg.axis().scale(x)
             .orient('bottom')
-            .ticks(chartOptions.XtickSize);
+            .ticks(this.options.XtickSize);
         let yAxis = d3.svg.axis().scale(y)
-            .orient('left').ticks(chartOptions.YtickSize);
+            .orient('left').ticks(this.options.YtickSize);
 
         // Define the valueline
         let valueline = d3.svg.line()
@@ -84,10 +162,11 @@ class ChartRenderer {
             .y((d) => {
                 return y(d.y);
             })
-            .interpolate(chartOptions.interpolatorType);
+            .interpolate(this.interpolator);
         // Append svg canvas to the body
         let svg = d3.select('.chart-container')
             .append('svg')
+                .classed('chart-graph', true)
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
             .append('g')
@@ -114,5 +193,8 @@ class ChartRenderer {
         svg.append('g')
             .attr('class', 'y axis')
             .call(yAxis);
+
+        //this.drawCirclePolygons(this.sampleDatas, x, y);
+
     }
 };

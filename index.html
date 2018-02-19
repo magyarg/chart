@@ -5,12 +5,46 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Chart Sample</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" media="screen" href="chart.css" />
 </head>
 <body>
-    <h1 class="header-text">Chart Playground</h1>
-    <!-- Placeholder div -->
-    <div class="chart-container"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 header">
+                <h1 class="text-center">Chart Playground</h1>
+            </div>
+            <div class="col-md-8">
+                <!-- Placeholder div -->
+                <div class="chart-container"></div>
+            </div>
+            <div class="col-md-4 sidebar">
+                <div class="form-group">
+                    <h1>Options</h1>
+                    <!-- Interpolator select -->
+                    <select name="interpolator" id="interpolator" class="form-control">
+                        <option value="linear">Linear</option>
+                        <option value="basis">Basis</option>
+                        <option value="cardinal">Cardinal</option>
+                        <option value="monotone">Monotone</option>
+                        <option value="bundle">Bundle</option>
+                    </select>
+                </div>
+                <!-- <div class="form-group">
+                    <h1>Datapoints</h1>
+                    <textarea
+                        name="chartData"
+                        id="chartData"
+                        cols="30"
+                        rows="15"
+                        class="form-control">
+                    </textarea>
+                </div>
+                <button type="button" class="btn btn-primary" id="setChartDataButton">Set datapoints</button> -->
+                <button type="button" class="btn btn-primary" id="updateChartDate">Update chart data</button>
+            </div>
+        </div>
+    </div>
 
     <script src="d3.js"></script>
     <script src="chartRenderer.js"></script>
@@ -21,8 +55,27 @@
             XtickSize: 9,
             interpolatorType: 'basis'
         };
-        let chart = new ChartRenderer();
-        chart.drawLine(options);
+        let chart = new ChartRenderer(options);
+        chart.drawLine();
+
+        // Interpolator update event handler
+        let interpolatorSelect = document.getElementById('interpolator');
+        interpolatorSelect.addEventListener('change', function() {
+            chart.setInterpolator(this.value);
+        });
+
+        // Chart data update event handler
+        // let setChartDataButton = document.getElementById('setChartDataButton');
+        // setChartDataButton.addEventListener('click', function() {
+        //     // NOTE: implement arbitrary reader
+        // });
+
+        // Update random dataset
+        let updateChartDate = document.getElementById('updateChartDate');
+        updateChartDate.addEventListener('click', function() {
+            console.log('update.chartdata')
+            chart.update();
+        });
 
     </script>
 </body>

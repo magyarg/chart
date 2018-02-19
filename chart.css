@@ -1,13 +1,15 @@
-body {
+html, body {
     font: 12px Arial;
+    margin: 0;
+    height: 100%;
 }
 
-.header-text {
-    text-align: center;
+body {
+    height: 100%;
 }
 
 path {
-    stroke: steelblue;
+    stroke: rgb(149, 49, 99);
     stroke-width: 2;
     fill: none;
 }
@@ -18,4 +20,8 @@ path {
     stroke: gray;
     stroke-width: 1;
     shape-rendering: crispEdges;
+}
+
+.header {
+    background-color: #ccc;
 }
