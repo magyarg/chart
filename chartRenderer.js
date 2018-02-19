@@ -53,6 +53,13 @@ class ChartRenderer {
         d3.select('.chart-graph').remove();
     }
 
+    resize() {
+        let canvas = d3.select('.chart-container');
+        let rect = canvas.node().getBoundingClientRect();
+        this.destroy();
+        this.drawLine(rect.width, rect.height);
+    }
+
     /**
      * Populate random value points for the
      * newly created dates.
@@ -90,71 +97,14 @@ class ChartRenderer {
         return dateArray;
     }
 
-    drawCirclePolygons(points, xScale, yScale) {
-        let circles = [];
-
-        if (points.length === 1) {
-            circles.push({
-                point: points[0]
-            });
-
-            return circles;
-        }
-
-        points.forEach(function (point, index, list) {
-            // if (point.y[index - 1] !== null) {
-            //     console.log('exclude');
-            //     return;
-            // }
-
-            let prevPoint = list[index - 1],
-                nextPoint = list[index + 1];
-
-            if (prevPoint) {
-                circles.push({
-                    point: prevPoint
-                });
-            }
-
-            if (nextPoint) {
-                circles.push({
-                    point: nextPoint
-                });
-            }
-        });
-
-        var circleData = d3.select('.chart-graph').selectAll('circle')
-            .data(circles);
-
-        circleData.enter()
-            .append('svg:circle')
-            .attr({
-                'cx': function (d) {
-                    return xScale(d.point.x);
-                }.bind(this),
-                'cy': function (d) {
-                    return yScale(d.point.y);
-                }.bind(this),
-                'r': 4.5,
-                'stroke-width': 3,
-                'stroke': 'black',
-                'fill': 'black',
-            });
-
-        circleData.exit()
-            .remove();
-
-    }
-
     /**
      * Draws the actual SVG line and places the
      * value paths.
      */
-    drawLine() {
-
+    drawLine(rectWidth, rectHeight) {
         let margin = { top: 30, right: 20, bottom: 30, left: 100 },
-        width = 1024 - margin.left - margin.right,
-        height = 550 - margin.top - margin.bottom;
+        width = (rectWidth) ? rectWidth - margin.left - margin.right : 1024 - margin.left - margin.right,
+        height = (rectHeight) ? rectHeight - margin.top - margin.bottom : 550 - margin.top - margin.bottom;
         let parseDate = d3.time.format('%d-%b-%y').parse;
 
         // Calculate the ranges
@@ -207,8 +157,6 @@ class ChartRenderer {
         svg.append('g')
             .attr('class', 'y axis')
             .call(yAxis);
-
-        //this.drawCirclePolygons(this.sampleDatas, x, y);
 
     }
 };
