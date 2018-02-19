@@ -62,7 +62,7 @@ class ChartRenderer {
         let sampleDatas = [];
         let dates = this.generateDateRange(new Date(), (new Date().addDays(55)));
         dates.forEach(function(date) {
-            let pointValue = Math.floor((Math.random() * 100) + 1);
+            let pointValue = Math.floor((Math.random() * 100));
             let point = {
                 x: date,
                 y: [pointValue]
